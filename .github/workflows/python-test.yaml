@@ -41,14 +41,16 @@ jobs:
             flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         - name: Make sure Python code is all compilable
           run: |
-            python -m compileall . -f
-        - name: Run Flask server
+            python -m compileall azureproject -f
+            python -m compileall restaurant_review -f
+        - name: Run Django server
           run: |
-            flask db upgrade
-            flask run &
+            python manage.py migrate
+            python manage.py test restaurant_review &&
+            python manage.py runserver &
           env:
             DBNAME: postgres
             DBHOST: localhost
             DBUSER: postgres
             DBPASS: postgres
-            SECRET_KEY: flask-insecure-key-${{ github.run_id }}-${{ github.run_attempt }}
+            SECRET_KEY: django-insecure-key-${{ github.run_id }}-${{ github.run_attempt }}
